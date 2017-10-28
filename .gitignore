@@ -1,3 +1,6 @@
+# Massive MNIST_data folder
+MNIST_data/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
