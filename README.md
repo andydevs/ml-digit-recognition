@@ -1,3 +1,3 @@
-# handwritten_digit_recognition.py
+# Machine Learning Digit Recognition
 
-Trains a neural network to recognize handwritten digits from the MNIST database.
+A project in python. Trains a neural network to recognize handwritten digits from the MNIST database.
