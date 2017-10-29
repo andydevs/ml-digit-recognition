@@ -23,21 +23,21 @@ Single Layer Neural Network: 784 -> 10
 
 Determines the numerical digit that the given image represents.
 """
-# Input X
-x = tf.placeholder(tf.float32, [None, 784])
+# Input z
+z = tf.placeholder(tf.float32, [None, 784])
 
 # Weights and biases of layer
 W = tf.Variable(tf.zeros([784, 10]))
 b = tf.Variable(tf.zeros([10]))
 
-# Output Y
-y = tf.nn.softmax(tf.matmul(x, W) + b)
+# Output p
+p = tf.nn.softmax(tf.matmul(z, W) + b)
 
-# Training Y
-y_ = tf.placeholder(tf.float32, [None, 10])
+# Training p
+p_ = tf.placeholder(tf.float32, [None, 10])
 
 # Error function (Least-Squares)
-J = tf.reduce_mean(tf.reduce_sum(tf.square(y_ - y), reduction_indices=[1]))
+J = tf.reduce_mean(tf.reduce_sum(tf.square(p_ - p), reduction_indices=[1]))
 
 # Trainer
 trainer = tf.train.GradientDescentOptimizer(0.5).minimize(J)
@@ -81,21 +81,24 @@ with tf.Session() as sess:
     # Initialize variables
     sess.run(tf.global_variables_initializer())
 
-    # Get sample params
+    # Session params
+    nmnist = mnist.test.images.shape[0]
+    nbatch = 100
+    epochs = 1000
     srows = 2
     scols = 2
-    sstart = randint(0, mnist.test.images.shape[0]-(srows*scols))
+    sstart = randint(0, nmnist-(srows*scols))
 
-    # ----------------------- Initial Run ------------------------
+    # -------------------- Initial Run ---------------------
     # Compute sample data
     print('Compute initial prediction')
-    predicts_0 = sess.run(y,
+    predicts_0 = sess.run(p,
         feed_dict={
-            x:mnist.test.images})
+            z:mnist.test.images})
     error_0 = sess.run(J,
         feed_dict={
-            x:mnist.test.images,
-            y_:mnist.test.labels})
+            z:mnist.test.images,
+            p_:mnist.test.labels})
 
     # Plot initial sample
     print('Plot initial prediction sample')
@@ -109,25 +112,25 @@ with tf.Session() as sess:
         cols=scols,
         start=sstart)
 
-    # ----------------------- Training Step ------------------------
+    # ------------------- Training Step --------------------
     print('Training...')
-    for _ in range(1000):
-        batch_xs, batch_ys = mnist.train.next_batch(100)
+    for _ in range(epochs):
+        batch_zs, batch_ps = mnist.train.next_batch(nbatch)
         sess.run(trainer,
             feed_dict={
-                x:batch_xs,
-                y_:batch_ys})
+                z:batch_zs,
+                p_:batch_ps})
 
-    # ------------------------- Final Run --------------------------
+    # --------------------- Final Run ----------------------
     # Get Sample Images and labels
     print('Compute final prediction')
-    predicts_1 = sess.run(y,
+    predicts_1 = sess.run(p,
         feed_dict={
-            x:mnist.test.images})
+            z:mnist.test.images})
     error_1 = sess.run(J,
         feed_dict={
-            x:mnist.test.images,
-            y_:mnist.test.labels})
+            z:mnist.test.images,
+            p_:mnist.test.labels})
 
     # Plot final samples
     print('Plot final prediction sample')
