@@ -26,12 +26,8 @@ Determines the numerical digit that the given image represents.
 # Input z
 z = tf.placeholder(tf.float32, [None, 784])
 
-# Weights and biases of layer
-W = tf.Variable(tf.zeros([784, 10]))
-b = tf.Variable(tf.zeros([10]))
-
 # Output p
-p = tf.nn.softmax(tf.matmul(z, W) + b)
+p = tf.contrib.layers.fully_connected(z, 10, activation_fn=tf.nn.softmax)
 
 # Training p
 p_ = tf.placeholder(tf.float32, [None, 10])
