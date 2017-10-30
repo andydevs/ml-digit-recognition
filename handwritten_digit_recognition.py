@@ -60,18 +60,24 @@ def show_sample(name, images, labels, predicts, error, rows=2, cols=2, start=0):
     :param cols: the number of columns in the subplot grid (default=2)
     :param start: the start of the data to sample (default=0)
     """
-    simages = np.reshape(images, (-1, 28, 28))
-    slabels = np.argmax(labels, axis=1)
-    spredicts = np.argmax(predicts, axis=1)
+    # Get formatted data
+    formatted_images = np.reshape(images, (-1, 28, 28))
+    formatted_labels = np.argmax(labels, axis=1)
+    formatted_predicts = np.argmax(predicts, axis=1)
+
+    # Create subplot plot
     plt.figure('{name} Sample Digits'.format(name=name))
     for index in range(rows*cols):
+        # Create subplot of each sample
         splt = plt.subplot(rows, cols, index+1)
         splt.set_title('Expected: {expected}, Predicted: {predicted}'.format(
-            expected=slabels[start+index],
-            predicted=spredicts[start+index]
+            expected=formatted_labels[start+index],
+            predicted=formatted_predicts[start+index]
         ))
         splt.axis('off')
-        splt.imshow(simages[start+index,:,:], cmap='gray')
+        splt.imshow(formatted_images[start+index,:,:], cmap='gray')
+
+    # Show plot and then print error
     plt.show()
     print('{name} error: {error}'.format(name=name, error=error))
 
