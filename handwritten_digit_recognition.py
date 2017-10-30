@@ -61,9 +61,9 @@ def show_sample(name, images, labels, predicts, error, rows=2, cols=2, start=0):
     :param start: the start of the data to sample (default=0)
     """
     samples = rows*cols
-    simages = images.reshape((-1, 28, 28))
-    slabels = np.array(labels).argmax(axis=1)
-    spredicts = np.array(predicts).argmax(axis=1)
+    simages = np.reshape(images, (-1, 28, 28))
+    slabels = np.argmax(labels, axis=1)
+    spredicts = np.argmax(predicts, axis=1)
     fig = plt.figure('Sample Digits')
     for index in range(samples):
         splt = plt.subplot(int(str(rows)+str(cols)+str(index+1)))
