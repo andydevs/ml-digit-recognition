@@ -63,7 +63,7 @@ def show_sample(name, images, labels, predicts, error, rows=2, cols=2, start=0):
     simages = np.reshape(images, (-1, 28, 28))
     slabels = np.argmax(labels, axis=1)
     spredicts = np.argmax(predicts, axis=1)
-    fig = plt.figure('{name} Sample Digits'.format(name=name))
+    plt.figure('{name} Sample Digits'.format(name=name))
     for index in range(rows*cols):
         splt = plt.subplot(rows, cols, index+1)
         splt.set_title('Expected: {expected}, Predicted: {predicted}'.format(
