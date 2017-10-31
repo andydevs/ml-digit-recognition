@@ -11,6 +11,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from tensorflow.examples.tutorials.mnist import input_data as mnist_input_data
 from random import randint
+from tqdm import tqdm
 
 # -------------------------------- HYPER PARAMS --------------------------------
 LEARNING_RATE = 0.2 # How quickly the network learns (sensitivity to error)
@@ -32,7 +33,7 @@ Determines the numerical digit that the given image represents.
 z = tf.placeholder(tf.float32, [None, 784])
 
 # Hidden layer
-h0 = tf.contrib.layers.fully_connected(z, 16, activation_fn=tf.nn.softmax)
+h0 = tf.contrib.layers.fully_connected(z, 256, activation_fn=tf.nn.softmax)
 
 # Output p
 p = tf.contrib.layers.fully_connected(h0, 10, activation_fn=tf.nn.softmax)
@@ -116,8 +117,8 @@ with tf.Session() as sess:
                 error=error_0)
 
     # --------------------- Training Step ----------------------
-    print('Training...')
-    for _ in range(TRAINING_EPOCHS):
+    print('Training Neural Network...')
+    for _ in tqdm(range(TRAINING_EPOCHS), desc='Training'):
         batch_zs, batch_ps = mnist.train.next_batch(BATCH_SIZE)
         sess.run(trainer, feed_dict={z:batch_zs, p_:batch_ps})
 
