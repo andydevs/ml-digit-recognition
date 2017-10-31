@@ -15,8 +15,8 @@ from tqdm import tqdm
 
 # -------------------------------- HYPER PARAMS --------------------------------
 LEARNING_RATE = 0.2 # How quickly the network learns (sensitivity to error)
-BATCH_SIZE = 400 # The number of samples in a batch in each training epochs
-TRAINING_EPOCHS = 1000 # The number of training epochs
+BATCH_SIZE = 1000 # The number of samples in a batch in each training epochs
+TRAINING_EPOCHS = 5000 # The number of training epochs
 
 # --------------------------------- MNIST Data ---------------------------------
 # Get MNIST Data
@@ -33,7 +33,7 @@ Determines the numerical digit that the given image represents.
 z = tf.placeholder(tf.float32, [None, 784])
 
 # Hidden layer
-h0 = tf.contrib.layers.fully_connected(z, 256, activation_fn=tf.nn.softmax)
+h0 = tf.contrib.layers.fully_connected(z, 16, activation_fn=tf.nn.softmax)
 
 # Output p
 p = tf.contrib.layers.fully_connected(h0, 10, activation_fn=tf.nn.softmax)
