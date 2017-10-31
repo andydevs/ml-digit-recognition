@@ -13,10 +13,9 @@ from tensorflow.examples.tutorials.mnist import input_data as mnist_input_data
 from random import randint
 
 # -------------------------------- HYPER PARAMS --------------------------------
-LEARNING_RATE = 0.5 # How quickly the network learns (sensitivity to error)
-BATCH_SIZE = 100 # The number of samples in a batch in each training epochs
+LEARNING_RATE = 0.2 # How quickly the network learns (sensitivity to error)
+BATCH_SIZE = 400 # The number of samples in a batch in each training epochs
 TRAINING_EPOCHS = 1000 # The number of training epochs
-SAMPLE_GRID = (2, 2) # The shape of the sample grid
 
 # --------------------------------- MNIST Data ---------------------------------
 # Get MNIST Data
@@ -25,7 +24,7 @@ mnist = mnist_input_data.read_data_sets('MNIST_data/', one_hot=True)
 
 # --------------------------- Neural Network System ----------------------------
 """
-Single Layer Neural Network: 784 -> 10
+Single Layer Neural Network: 784 -> 16 -> 10
 
 Determines the numerical digit that the given image represents.
 """
@@ -48,26 +47,32 @@ error = tf.reduce_mean(tf.reduce_sum(tf.square(p_ - p), reduction_indices=[1]))
 trainer = tf.train.GradientDescentOptimizer(LEARNING_RATE).minimize(error)
 
 # ----------------------------- Show Sample Helper -----------------------------
-def show_sample(name, images, labels, predicts, error, rows=2, cols=2, start=None):
+def show_sample(name, images, labels, predicts, error):
     """
     HELPER FUNCTION
 
-    Shows a sample of the given MNIST data and the resulting predictions from
-    the neural network. Plots images, labels, and predictions in a subplot with
-    the given rows and columns. Prints the given error afterwards.
+    Shows a sample of the given MNIST data and the resulting predictions
+    from the neural network. Plots images, labels, and predictions in a
+    subplot with the given rows and columns. Prints the given error
+    afterwards.
 
     :param name: the name of the dataset
     :param images: the images of the MNIST data
     :param labels: the labels of the MNIST data
     :param predicts: the predictions from the Nerual Network
     :param error: the error of the prediction from the Neural Network
-    :param rows: the number of rows in the subplot grid (default=2)
-    :param cols: the number of columns in the subplot grid (default=2)
-    :param start: the start of the data to sample (default=None)
     """
-    # Default samples start
-    if start is None:
-        start = randint(0, images.shape[0] - (rows*cols))
+    # Title formatters
+    plot_title = '{name} Sample Digits'
+    subplot_title = 'Expected: {expected}, Predicted: {predicted}'
+    error_title = '{name} error: {error}'
+
+    # Rows and columns of subplot
+    rows = 2
+    cols = 2
+
+    # Randomized samples start
+    start = randint(0, images.shape[0] - (rows*cols))
 
     # Get formatted data
     formatted_images = np.reshape(images, (-1, 28, 28))
@@ -75,11 +80,11 @@ def show_sample(name, images, labels, predicts, error, rows=2, cols=2, start=Non
     formatted_predicts = np.argmax(predicts, axis=1)
 
     # Create subplot plot
-    plt.figure('{name} Sample Digits'.format(name=name))
+    plt.figure(plot_title.format(name=name))
     for index in range(rows*cols):
         # Create subplot of each sample
         splt = plt.subplot(rows, cols, index+1)
-        splt.set_title('Expected: {expected}, Predicted: {predicted}'.format(
+        splt.set_title(subplot_title.format(
             expected=formatted_labels[start+index],
             predicted=formatted_predicts[start+index]
         ))
@@ -88,7 +93,7 @@ def show_sample(name, images, labels, predicts, error, rows=2, cols=2, start=Non
 
     # Show plot and then print error
     plt.show()
-    print('{name} error: {error}'.format(name=name, error=error))
+    print(error_title.format(name=name, error=error))
 
 # ----------------------------------- Session ----------------------------------
 with tf.Session() as sess:
@@ -108,9 +113,7 @@ with tf.Session() as sess:
                 images=mnist.test.images,
                 labels=mnist.test.labels,
                 predicts=predicts_0,
-                error=error_0,
-                rows=SAMPLE_GRID[0],
-                cols=SAMPLE_GRID[1])
+                error=error_0)
 
     # --------------------- Training Step ----------------------
     print('Training...')
@@ -131,6 +134,4 @@ with tf.Session() as sess:
                 images=mnist.test.images,
                 labels=mnist.test.labels,
                 predicts=predicts_1,
-                error=error_1,
-                rows=SAMPLE_GRID[0],
-                cols=SAMPLE_GRID[1])
+                error=error_1)
