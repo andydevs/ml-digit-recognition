@@ -42,10 +42,10 @@ p = tf.contrib.layers.fully_connected(h0, 10, activation_fn=tf.nn.softmax)
 p_ = tf.placeholder(tf.float32, [None, 10])
 
 # Error function (Least-Squares)
-J = tf.reduce_mean(tf.reduce_sum(tf.square(p_ - p), reduction_indices=[1]))
+error = tf.reduce_mean(tf.reduce_sum(tf.square(p_ - p), reduction_indices=[1]))
 
 # Trainer
-trainer = tf.train.GradientDescentOptimizer(LEARNING_RATE).minimize(J)
+trainer = tf.train.GradientDescentOptimizer(LEARNING_RATE).minimize(error)
 
 # ----------------------------- Show Sample Helper -----------------------------
 def show_sample(name, images, labels, predicts, error, rows=2, cols=2, start=None):
@@ -99,8 +99,8 @@ with tf.Session() as sess:
     # Compute sample data
     print('Compute initial prediction')
     predicts_0 = sess.run(p, feed_dict={z:mnist.test.images})
-    error_0 = sess.run(J, feed_dict={z:mnist.test.images,
-                                     p_:mnist.test.labels})
+    error_0 = sess.run(error, feed_dict={z:mnist.test.images,
+                                         p_:mnist.test.labels})
 
     # Plot initial sample
     print('Plot initial prediction sample')
@@ -122,8 +122,8 @@ with tf.Session() as sess:
     # Get Sample Images and labels
     print('Compute final prediction')
     predicts_1 = sess.run(p, feed_dict={z:mnist.test.images})
-    error_1 = sess.run(J, feed_dict={z:mnist.test.images,
-                                     p_:mnist.test.labels})
+    error_1 = sess.run(error, feed_dict={z:mnist.test.images,
+                                         p_:mnist.test.labels})
 
     # Plot final samples
     print('Plot final prediction sample')
