@@ -48,14 +48,7 @@ J = tf.reduce_mean(tf.reduce_sum(tf.square(p_ - p), reduction_indices=[1]))
 trainer = tf.train.GradientDescentOptimizer(LEARNING_RATE).minimize(J)
 
 # ----------------------------- Show Sample Helper -----------------------------
-def show_sample(name,
-                images,
-                labels,
-                predicts,
-                error,
-                rows=2,
-                cols=2,
-                start=None):
+def show_sample(name, images, labels, predicts, error, rows=2, cols=2, start=None):
     """
     HELPER FUNCTION
 
