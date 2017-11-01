@@ -16,7 +16,7 @@ from tqdm import tqdm
 # -------------------------------- HYPER PARAMS --------------------------------
 LEARNING_RATE = 0.2 # How quickly the network learns (sensitivity to error)
 BATCH_SIZE = 500 # The number of samples in a batch in each training epoch
-TRAINING_EPOCHS = 5000 # The number of training epochs
+TRAINING_EPOCHS = 1000 # The number of training epochs
 
 # --------------------------------- MNIST Data ---------------------------------
 # Get MNIST Data
@@ -27,31 +27,35 @@ mnist = mnist_input_data.read_data_sets('MNIST_data/', one_hot=True)
 """
 Convolution Neural Network:
 
-input(28, 28, 1)
-convolve(4, 4)
-relu(7, 7, 1)
-flatten(49)
+input(784)
+reshape(28,28,1)
+convolveRELU(4, 4)
+reshape(49)
 softmax(10)
 output(10)
 
 Determines the numerical digit that the given image represents.
 """
 # Input z
-z = tf.placeholder(tf.float32, [None, 28, 28, 1])
+z = tf.placeholder(tf.float32, [None, 784])
+
+# Reshape layer
+s0 = tf.reshape(z, [-1, 28, 28, 1])
 
 # Convolution layer
 c0 = tf.contrib.layers.conv2d(
-    inputs=z,
+    inputs=s0,
     num_outputs=1,
     kernel_size=(4, 4),
+    stride=4,
     activation_fn=tf.nn.relu)
 
-# Flattened layer
-f = tf.contrib.layers.flatten(c0)
+# Reshape layer
+s1 = tf.reshape(c0, [-1, 49])
 
 # Output p
 p = tf.contrib.layers.fully_connected(
-    inputs=f,
+    inputs=s1,
     num_outputs=10,
     activation_fn=tf.nn.softmax)
 
@@ -118,27 +122,17 @@ with tf.Session() as sess:
     # Initialize variables
     sess.run(tf.global_variables_initializer())
 
-    # Square shape
-    square_shape = (-1, 28, 28, 1)
-
-    # squarify_batch function
-    squarify_batch = lambda zs, ps: (zs.reshape(square_shape), ps)
-
-    # Square images
-    sq_mnist_test = mnist.test.images.reshape(square_shape)
-    sq_mnist_train = mnist.train.images.reshape(square_shape)
-
     # ---------------------- Initial Run -----------------------
     # Compute sample data
     print('Compute initial prediction')
-    predicts_0 = sess.run(p, feed_dict={z:sq_mnist_test})
-    error_0 = sess.run(error, feed_dict={z:sq_mnist_test,
+    predicts_0 = sess.run(p, feed_dict={z:mnist.test.images})
+    error_0 = sess.run(error, feed_dict={z:mnist.test.images,
                                          p_:mnist.test.labels})
 
     # Plot initial sample
     print('Plot initial prediction sample')
     show_sample(name='Initial',
-                images=sq_mnist_test,
+                images=mnist.test.images,
                 labels=mnist.test.labels,
                 predicts=predicts_0,
                 error=error_0)
@@ -147,20 +141,19 @@ with tf.Session() as sess:
     print('Training Neural Network...')
     for _ in tqdm(range(TRAINING_EPOCHS), desc='Training'):
         batch_zs, batch_ps = mnist.train.next_batch(BATCH_SIZE)
-        batch_zs, batch_ps = squarify_batch(batch_zs, batch_ps)
         sess.run(trainer, feed_dict={z:batch_zs, p_:batch_ps})
 
     # ----------------------- Final Run ------------------------
     # Get Sample Images and labels
     print('Compute final prediction')
-    predicts_1 = sess.run(p, feed_dict={z:sq_mnist_test})
-    error_1 = sess.run(error, feed_dict={z:sq_mnist_test,
+    predicts_1 = sess.run(p, feed_dict={z:mnist.test.images})
+    error_1 = sess.run(error, feed_dict={z:mnist.test.images,
                                          p_:mnist.test.labels})
 
     # Plot final samples
     print('Plot final prediction sample')
     show_sample(name='Final',
-                images=sq_mnist_test,
+                images=mnist.test.images,
                 labels=mnist.test.labels,
                 predicts=predicts_1,
                 error=error_1)
