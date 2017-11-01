@@ -63,7 +63,7 @@ p = tf.contrib.layers.fully_connected(
 p_ = tf.placeholder(tf.float32, [None, 10])
 
 # Error function (Least-Squares)
-error = tf.reduce_mean(tf.reduce_sum(tf.square(p_ - p), reduction_indices=[1]))
+error = tf.losses.mean_squared_error(labels=p_, predictions=p)
 
 # Trainer
 trainer = tf.train.GradientDescentOptimizer(LEARNING_RATE).minimize(error)
