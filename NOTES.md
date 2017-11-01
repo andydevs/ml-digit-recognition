@@ -7,3 +7,4 @@
 - Activation functions can affect training
     - Vanishing Gradient Problem
 - Softmax and Sigmoid are slightly different
+- ReLU layers seem to work really well

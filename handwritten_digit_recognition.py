@@ -34,11 +34,12 @@ Determines the numerical digit that the given image represents.
 # Input z
 z = tf.placeholder(tf.float32, [None, 784])
 
-# Hidden layer
-h0 = tf.contrib.layers.fully_connected(z, 16, activation_fn=tf.nn.sigmoid)
+# Hidden layers
+h0 = tf.contrib.layers.fully_connected(z,  16, activation_fn=tf.nn.relu)
+h1 = tf.contrib.layers.fully_connected(h0, 16, activation_fn=tf.nn.relu)
 
 # Output p
-p = tf.contrib.layers.fully_connected(h0, 10, activation_fn=tf.nn.softmax)
+p = tf.contrib.layers.fully_connected(h1, 10, activation_fn=tf.nn.softmax)
 
 # Training p
 p_ = tf.placeholder(tf.float32, [None, 10])
