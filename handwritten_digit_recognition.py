@@ -25,21 +25,35 @@ mnist = mnist_input_data.read_data_sets('MNIST_data/', one_hot=True)
 
 # --------------------------- Neural Network System ----------------------------
 """
-Single Layer Neural Network:
+Convolution Neural Network:
 
-input(784) -> sigmoid(16) -> softmax(10)
+input(28, 28, 1)
+convolve(4, 4)
+relu(7, 7, 1)
+flatten(49)
+softmax(10)
+output(10)
 
 Determines the numerical digit that the given image represents.
 """
 # Input z
-z = tf.placeholder(tf.float32, [None, 784])
+z = tf.placeholder(tf.float32, [None, 28, 28, 1])
 
-# Hidden layers
-h0 = tf.contrib.layers.fully_connected(z,  16, activation_fn=tf.nn.relu)
-h1 = tf.contrib.layers.fully_connected(h0, 16, activation_fn=tf.nn.relu)
+# Convolution layer
+c0 = tf.contrib.layers.conv2d(
+    inputs=z,
+    num_outputs=1,
+    kernel_size=(4, 4),
+    activation_fn=tf.nn.relu)
+
+# Flattened layer
+f = tf.contrib.layers.flatten(c0)
 
 # Output p
-p = tf.contrib.layers.fully_connected(h1, 10, activation_fn=tf.nn.softmax)
+p = tf.contrib.layers.fully_connected(
+    inputs=f,
+    num_outputs=10,
+    activation_fn=tf.nn.softmax)
 
 # Training p
 p_ = tf.placeholder(tf.float32, [None, 10])
@@ -61,7 +75,7 @@ def show_sample(name, images, labels, predicts, error):
     afterwards.
 
     :param name: the name of the dataset
-    :param images: the images of the MNIST data
+    :param images: the images of the MNIST data (Kx28x28 array)
     :param labels: the labels of the MNIST data
     :param predicts: the predictions from the Nerual Network
     :param error: the error of the prediction from the Neural Network
@@ -104,17 +118,27 @@ with tf.Session() as sess:
     # Initialize variables
     sess.run(tf.global_variables_initializer())
 
+    # Square shape
+    square_shape = (-1, 28, 28, 1)
+
+    # squarify_batch function
+    squarify_batch = lambda zs, ps: (zs.reshape(square_shape), ps)
+
+    # Square images
+    sq_mnist_test = mnist.test.images.reshape(square_shape)
+    sq_mnist_train = mnist.train.images.reshape(square_shape)
+
     # ---------------------- Initial Run -----------------------
     # Compute sample data
     print('Compute initial prediction')
-    predicts_0 = sess.run(p, feed_dict={z:mnist.test.images})
-    error_0 = sess.run(error, feed_dict={z:mnist.test.images,
+    predicts_0 = sess.run(p, feed_dict={z:sq_mnist_test})
+    error_0 = sess.run(error, feed_dict={z:sq_mnist_test,
                                          p_:mnist.test.labels})
 
     # Plot initial sample
     print('Plot initial prediction sample')
     show_sample(name='Initial',
-                images=mnist.test.images,
+                images=sq_mnist_test,
                 labels=mnist.test.labels,
                 predicts=predicts_0,
                 error=error_0)
@@ -123,19 +147,20 @@ with tf.Session() as sess:
     print('Training Neural Network...')
     for _ in tqdm(range(TRAINING_EPOCHS), desc='Training'):
         batch_zs, batch_ps = mnist.train.next_batch(BATCH_SIZE)
+        batch_zs, batch_ps = squarify_batch(batch_zs, batch_ps)
         sess.run(trainer, feed_dict={z:batch_zs, p_:batch_ps})
 
     # ----------------------- Final Run ------------------------
     # Get Sample Images and labels
     print('Compute final prediction')
-    predicts_1 = sess.run(p, feed_dict={z:mnist.test.images})
-    error_1 = sess.run(error, feed_dict={z:mnist.test.images,
+    predicts_1 = sess.run(p, feed_dict={z:sq_mnist_test})
+    error_1 = sess.run(error, feed_dict={z:sq_mnist_test,
                                          p_:mnist.test.labels})
 
     # Plot final samples
     print('Plot final prediction sample')
     show_sample(name='Final',
-                images=mnist.test.images,
+                images=sq_mnist_test,
                 labels=mnist.test.labels,
                 predicts=predicts_1,
                 error=error_1)
