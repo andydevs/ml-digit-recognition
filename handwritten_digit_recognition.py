@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 # -------------------------------- HYPER PARAMS --------------------------------
 LEARNING_RATE = 0.2 # How quickly the network learns (sensitivity to error)
-BATCH_SIZE = 1000 # The number of samples in a batch in each training epochs
+BATCH_SIZE = 500 # The number of samples in a batch in each training epoch
 TRAINING_EPOCHS = 5000 # The number of training epochs
 
 # --------------------------------- MNIST Data ---------------------------------
@@ -25,7 +25,9 @@ mnist = mnist_input_data.read_data_sets('MNIST_data/', one_hot=True)
 
 # --------------------------- Neural Network System ----------------------------
 """
-Single Layer Neural Network: 784 -> 16 -> 10
+Single Layer Neural Network:
+
+input(784) -> sigmoid(16) -> softmax(10)
 
 Determines the numerical digit that the given image represents.
 """
@@ -33,7 +35,7 @@ Determines the numerical digit that the given image represents.
 z = tf.placeholder(tf.float32, [None, 784])
 
 # Hidden layer
-h0 = tf.contrib.layers.fully_connected(z, 16, activation_fn=tf.nn.softmax)
+h0 = tf.contrib.layers.fully_connected(z, 16, activation_fn=tf.nn.sigmoid)
 
 # Output p
 p = tf.contrib.layers.fully_connected(h0, 10, activation_fn=tf.nn.softmax)
