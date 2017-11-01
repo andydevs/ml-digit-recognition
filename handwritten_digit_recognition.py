@@ -16,7 +16,7 @@ from tqdm import tqdm
 # -------------------------------- HYPER PARAMS --------------------------------
 LEARNING_RATE = 0.2 # How quickly the network learns (sensitivity to error)
 BATCH_SIZE = 500 # The number of samples in a batch in each training epoch
-TRAINING_EPOCHS = 1000 # The number of training epochs
+TRAINING_EPOCHS = 5000 # The number of training epochs
 
 # --------------------------------- MNIST Data ---------------------------------
 # Get MNIST Data
