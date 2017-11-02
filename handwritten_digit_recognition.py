@@ -151,12 +151,10 @@ with tf.Session() as sess:
     # --------------------- Training Step ----------------------
     print('Training Neural Network...')
     for i in tqdm(range(TRAINING_EPOCHS), desc='Training'):
-        # Train batch
+        # Train batch and add summary
         batch_zs, batch_ps = mnist.train.next_batch(BATCH_SIZE)
         _, summ = sess.run([trainer, summary],
                            feed_dict={z:batch_zs, p_:batch_ps})
-
-        # Add summary
         writer.add_summary(summ, i)
 
     # ----------------------- Final Run ------------------------
