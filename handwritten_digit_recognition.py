@@ -18,6 +18,7 @@ from time import time
 LEARNING_RATE = 0.2 # How quickly the network learns (sensitivity to error)
 BATCH_SIZE = 500 # The number of samples in a batch in each training epoch
 TRAINING_EPOCHS = 5000 # The number of training epochs
+LOGPATH = 'logs'
 
 # --------------------------------- MNIST Data ---------------------------------
 # Get MNIST Data
@@ -66,6 +67,13 @@ error = tf.losses.mean_squared_error(labels=p_, predictions=p)
 
 # Trainer
 trainer = tf.train.GradientDescentOptimizer(LEARNING_RATE).minimize(error)
+
+# Summary
+tf.summary.scalar('error', error)
+tf.summary.histogram('Kc0', Kc0)
+tf.summary.histogram('Wp', Wp)
+tf.summary.histogram('bp', bp)
+summary = tf.summary.merge_all()
 
 # ----------------------------- Show Sample Helper -----------------------------
 def show_sample(name, images, labels, predicts, error):
@@ -121,6 +129,10 @@ with tf.Session() as sess:
     # Initialize variables
     sess.run(tf.global_variables_initializer())
 
+    # Create session writer
+    writer = tf.summary.FileWriter(LOGPATH,
+                                   graph=tf.get_default_graph())
+
     # ---------------------- Initial Run -----------------------
     # Compute sample data
     print('Compute initial prediction')
@@ -138,9 +150,14 @@ with tf.Session() as sess:
 
     # --------------------- Training Step ----------------------
     print('Training Neural Network...')
-    for _ in tqdm(range(TRAINING_EPOCHS), desc='Training'):
+    for i in tqdm(range(TRAINING_EPOCHS), desc='Training'):
+        # Train batch
         batch_zs, batch_ps = mnist.train.next_batch(BATCH_SIZE)
-        sess.run(trainer, feed_dict={z:batch_zs, p_:batch_ps})
+        _, summ = sess.run([trainer, summary],
+                           feed_dict={z:batch_zs, p_:batch_ps})
+
+        # Add summary
+        writer.add_summary(summ, i)
 
     # ----------------------- Final Run ------------------------
     # Get Sample Images and labels
@@ -156,3 +173,6 @@ with tf.Session() as sess:
                 labels=mnist.test.labels,
                 predicts=predicts_1,
                 error=error_1)
+
+    # ---------------------- Close Writer ----------------------
+    writer.close()
