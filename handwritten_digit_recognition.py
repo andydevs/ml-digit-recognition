@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from tensorflow.examples.tutorials.mnist import input_data as mnist_input_data
 from random import randint
 from tqdm import tqdm
+from time import time
 
 # -------------------------------- HYPER PARAMS --------------------------------
 LEARNING_RATE = 0.2 # How quickly the network learns (sensitivity to error)
@@ -36,31 +37,29 @@ output(10)
 
 Determines the numerical digit that the given image represents.
 """
+# Initialize random seed
+tf.set_random_seed(int(time()))
+
 # Input z
-z = tf.placeholder(tf.float32, [None, 784])
+z = tf.placeholder(tf.float32, [None, 784], name='z')
 
 # Reshape layer
 s0 = tf.reshape(z, [-1, 28, 28, 1])
 
 # Convolution layer
-c0 = tf.contrib.layers.conv2d(
-    inputs=s0,
-    num_outputs=1,
-    kernel_size=(4, 4),
-    stride=4,
-    activation_fn=tf.nn.relu)
+Kc0 = tf.Variable(tf.random_uniform([4, 4, 1, 1]), name='Kc0')
+c0 = tf.nn.conv2d(s0, Kc0, strides=[1, 4, 4, 1], padding='SAME')
 
 # Reshape layer
 s1 = tf.reshape(c0, [-1, 49])
 
-# Output p
-p = tf.contrib.layers.fully_connected(
-    inputs=s1,
-    num_outputs=10,
-    activation_fn=tf.nn.softmax)
+# Fully-Connected Layer to Output P
+Wp = tf.Variable(tf.random_uniform([49, 10]), name='Wp')
+bp = tf.Variable(tf.random_uniform([10]), name='bp')
+p = tf.nn.softmax(tf.matmul(s1, Wp) + bp)
 
 # Training p
-p_ = tf.placeholder(tf.float32, [None, 10])
+p_ = tf.placeholder(tf.float32, [None, 10], name='p_')
 
 # Error function (Least-Squares)
 error = tf.losses.mean_squared_error(labels=p_, predictions=p)
