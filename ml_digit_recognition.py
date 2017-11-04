@@ -31,7 +31,8 @@ Convolution Neural Network:
 
 input(784)
 reshape(28,28,1)
-convolveRELU(4, 4)
+convolve(4, 4)
+relu(4, 4)
 reshape(49)
 softmax(10)
 output(10)
@@ -50,6 +51,9 @@ s0 = tf.reshape(z, [-1, 28, 28, 1])
 # Convolution layer
 Kc0 = tf.Variable(tf.random_uniform([4, 4, 1, 1]), name='Kc0')
 c0 = tf.nn.conv2d(s0, Kc0, strides=[1, 4, 4, 1], padding='SAME')
+
+# RELU layer
+r0 = tf.nn.relu(c0)
 
 # Reshape layer
 s1 = tf.reshape(c0, [-1, 49])
